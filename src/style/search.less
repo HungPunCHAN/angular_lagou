@@ -1,0 +1,33 @@
+.search-bar{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: @headerBgColor;
+  .h(40);
+  .lh(40);
+  margin: 0 auto;
+  input{
+    background-color: @bodyBgColor;
+    border-radius:10px;
+    .h(25);
+    .w(190);
+    .pl(20);
+  }
+  button{
+    background-color:@headerBgColor;
+    &:first-child{
+      color: @defaultColor;
+    }
+    &:last-child{
+      color: @muteColor;
+      margin-left: 10px;
+      padding-left: 20px;
+      background: url(../image/search.png) no-repeat left 3px;
+      background-size: 15px 15px;
+    }
+  }
+}
+.search-list{
+  .mt(80);
+}

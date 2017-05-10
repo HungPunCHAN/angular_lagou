@@ -1,0 +1,101 @@
+.register{
+  background-image:url(../image/background.png);
+  background-repeat:no-repeat;
+  background-size:100% 100%;
+  position: fixed;
+  top:0;
+  bottom:0;
+  right: 0;
+  left:0;
+  form{
+    z-index: 2;
+    .mt(55);
+
+    .form-line{
+      margin-left: auto;
+      margin-right: auto;
+      .w(300);
+      .h(40);
+      .lh(40);
+      font-size: 0;
+      box-sizing: content-box;
+      background-color:@formBgColor;
+      color:@defaultColor;
+      &:first-child{
+        border-bottom: 1px solid @defaultColor;
+      };
+      span{
+        background-color: @iconBgColor;
+        height: 100%;
+        .w(55);
+        background-position: 17px 9px;
+        background-repeat: no-repeat;
+      }
+      input{
+        border-width: 0;
+        outline-width: 0;
+        box-sizing: border-box;
+        .w(245);
+        height: 100%;
+        .fs(14);
+        .pl(30);
+        background-color: @formBgColor;
+        color:@defaultColor;
+        &::-webkit-input-placeholder{
+          color:@defaultColor;
+        }
+      }
+      .account{
+        background-image:url(../image/account.png);
+      }
+      .lock{
+        background-image:url(../image/lock.png);
+      }
+    }
+
+    .message-wrap{
+      margin-left: auto;
+      margin-right: auto;
+      .w(300);
+      .mt(40);
+      .message-box{
+        border-width: 0;
+        outline-width: 0;
+        background-color: @formBgColor;
+        color: @defaultColor;
+        .h(40);
+        .w(190);
+        .pl(30);
+        box-sizing: border-box;
+        &::-webkit-input-placeholder{
+          color:@defaultColor;
+        }
+      }
+      .message{
+        .fs(14);
+        color: @headerBgColor;
+        border: 1px solid @headerBgColor;
+        padding: 5px;
+        margin-top: 10px;
+      }
+    }
+
+    button{
+      .w(300);
+      .h(35);
+      font-size: 22px;
+      font-weight: bold;
+      &.login-btn{
+        margin-top: 60px;
+        background-color: @headerBgColor;
+        color: @defaultColor;
+      }
+      &.register-btn{
+        margin-top: 20px;
+        background-color: @btnBgColor;
+        color: @headerBgColor;
+        border: 1px solid @headerBgColor;
+      }
+    }
+  }
+}

@@ -1,0 +1,22 @@
+<ul class="position-list bg-w">
+<!--	<li class="item">
+		<img class="f-l logo" src="image/company-3.png">
+		<h3 class="title">销售</h3>
+		<p class="text">
+			百度[上海]互联网<br>
+			2016-06-01  11:05
+		</p>
+	</li>
+-->
+			<!--
+			ng-repeat="item in list":遍历数值，item定义一个变量名代表数组中的一个元素，in，list数组的名字
+			ng-src:获取路径
+			-->
+    <li ui-sref="position({id:item.id})" class="item clearfix" ng-repeat="item in data|filterByObj:filterObj">
+    	<img class="f-l logo" ng-src="{{item.imageUrl}}">
+    	<h3 class="title" ng-bind="item.job"></h3>
+		<p class="text" ng-bind="item.companyName+'['+item.cityName+']'+item.scaleName"></p>
+		<p class="text" ng-bind="item.salaryName"></p>
+		<p class="text" ng-bind="item.date"></p>
+    </li>
+</ul>

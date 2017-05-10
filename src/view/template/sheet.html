@@ -1,0 +1,9 @@
+<!--搜索页面遮罩层-->
+<div class="sheet" ng-show="visible" ng-click="visible=false;">
+    <div class="warp">
+        <ul class="text-c">
+            <li class="d-b" ng-click="select(item)" ng-repeat="item in list" ng-bind="item.name">不限</li>
+        </ul>
+        <button class="text-c d-b" ng-click="visible=false;">取消</button>
+    </div>
+</div>

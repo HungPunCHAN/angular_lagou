@@ -1,0 +1,27 @@
+{
+  "name": "webapp lagou",
+  "description": "angularjs webapp",
+  "main": "index.js",
+  "authors": [
+    "beta"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "angularjs"
+  ],
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-animate": "^1.6.4",
+    "angular-cookies": "^1.6.4",
+    "angular-ui-router": "ui-route#^0.4.2",
+    "angular": "^1.6.4",
+    "angular-validation": "^1.4.3"
+  }
+}
