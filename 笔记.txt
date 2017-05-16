@@ -85,5 +85,10 @@ $http['post'/'delete'/'put'](url，{
 });
 
 
+动画：
+常用的两种方式：
+animate.css :css文件，github上的开源项目
+angular-animate: ng-enter、ng-leave
+
 
 

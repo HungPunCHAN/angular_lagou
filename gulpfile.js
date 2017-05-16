@@ -99,7 +99,7 @@ gulp.task("clean",function(){
 
 //编写一个服务
 gulp.task("serve",["bulid"],function(){
-    $.connect.server({              //用gulp-server模块的server（）创建web服务器
+    $.connect.server({              //用gulp-connect模块的server（）创建web服务器
         root:[app.devPath],       //找到路径     读取路径
         livereload:true,          //针对高级浏览器，自动刷新
         port:6644                  //指定端口

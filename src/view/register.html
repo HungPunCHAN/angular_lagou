@@ -2,19 +2,19 @@
 <!--angular-validation 国产开发的表单验证插件，angular自带的验证插件不够强大-->
 <div class="register">
     <form class="d-b text-c" name="form">
-        <div class="form-line text-l">
-            <span class="account d-ib va-m"></span>
-            <input ng-model="user.phone" validator="phone" class="d-ib va-m" type="text" placeholder="输入手机号">
+        <div class="form-line text-l p-r">
+            <span class="icon account d-ib va-m"></span>
+            <input ng-model="user.phone" validator="required,phone" name="phone" class="d-ib va-m" type="text" placeholder="输入手机号">
         </div>
-        <div class="form-line text-l">
-            <span class="lock d-ib va-m"></span>
-            <input ng-model="user.password" validator="password" class="d-ib va-m" type="password" placeholder="设置6位以上的密码">
+        <div class="form-line text-l p-r">
+            <span class="icon lock d-ib va-m"></span>
+            <input ng-model="user.password" validator="required,password" name="password" class="d-ib va-m" type="password" placeholder="设置6位以上的密码">
         </div>
-        <div class="message-wrap text-l">
-            <input type="text" class="message-box" placeholder="短信验证码">
-            <span class="message f-r">发送短信</span>
+        <div class="message-wrap text-l clearfix p-r">
+            <input type="text" class="message-box" ng-model="user.code" name="code" validator="required" placeholder="短信验证码">
+            <span class="message f-r {{time?'disabled':''}}" ng-click="time?1==1:send()" ng-bind="time?time:'发送短信'"></span>
         </div>
-        <button class="login-btn">登录</button>
+        <button class="login-btn" ui-sref="login">登录</button>
         <button class="register-btn" validation-submit="form" ng-click="submit()">注册</button>
     </form>
 </div>

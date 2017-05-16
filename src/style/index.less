@@ -12,6 +12,37 @@
 @import "login.less";
 @import "register.less";
 @import "me.less";
+@import "post.less";
+
+.animated {
+  animation-duration: 1s;
+  -webkit-animation-duration: 1s;
+  animation-fill-mode: both;
+  -webkit-animation-fill-mode:both;
+}
+
+//页面切换时的动画:
+//animate.css方式
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.fadeIn {
+  animation-name: fadeIn;
+}
+//ng-animate 方式
+.ng-enter {
+  transition:0.5s linear all;
+  opacity:0;
+}
+.ng-enter-active {
+  opacity:1;
+}
+
 
 body,ul,ol,li,dl,dt,dd,input,textarea{
   margin: 0;

@@ -5,12 +5,12 @@ service(）和facotry()的区别：facotry()在return之前可以定义一些私
 */
 angular.module('app')
    //angular通过service（）方法定义服务
-    .service('cache',['$cookies',function($cookies){
+    .service('cache',['$cookieStore',function($cookies){
         this.put = function(key,value){
             $cookies.put(key,value);
         };
-        this.get = function(key){
-            $cookies.get(key);
+        this.get=function(key){
+            return $cookies.get(key);
         };
         this.remove = function(key){
             $cookies.remove(key);

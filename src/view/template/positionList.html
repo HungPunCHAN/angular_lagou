@@ -12,11 +12,15 @@
 			ng-repeat="item in list":遍历数值，item定义一个变量名代表数组中的一个元素，in，list数组的名字
 			ng-src:获取路径
 			-->
-    <li ui-sref="position({id:item.id})" class="item clearfix" ng-repeat="item in data|filterByObj:filterObj">
+    <li ui-sref="position({id:item.id})" class="item clearfix p-r" ng-repeat="item in data|filterByObj:filterObj">
     	<img class="f-l logo" ng-src="{{item.imageUrl}}">
     	<h3 class="title" ng-bind="item.job"></h3>
 		<p class="text" ng-bind="item.companyName+'['+item.cityName+']'+item.scaleName"></p>
-		<p class="text" ng-bind="item.salaryName"></p>
-		<p class="text" ng-bind="item.date"></p>
+		<p class="text">
+			<span ng-bind="item.salaryName"></span>
+			<span ng-bind="item.date"></span>
+		</p>
+		<p class="text"></p>
+		<span ng-if="isFavorite" class="icon p-a {{item.select?'star-active':'star'}}" ng-click="$event.stopPropagation();select(item)"></span>
     </li>
 </ul>

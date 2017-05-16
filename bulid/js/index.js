@@ -2,7 +2,7 @@
  * Created by Administrator on 2017/4/27.
  */
     "use strict";          //严格模式
-angular.module('app',['ui.router','ngCookies','validation']);             //创建angular模块，并声明依赖,引入ui-route模块
+angular.module('app',['ui.router','ngCookies','validation','ngAnimate']);             //创建angular模块，并声明依赖,引入ui-route模块
 'use strict';
 //angular.module('app').value()创建一个全局的变量，跟service（）有点像，只是它没有动态逻辑，只是一个值
 angular.module('app').value('dict',{}).run(['dict','$http',function(dict,$http){
@@ -19,6 +19,29 @@ angular.module('app').value('dict',{}).run(['dict','$http',function(dict,$http){
         dict.scale = resp.data;
         console.log(dict.scale);
     });
+}]);
+'use strict';
+/*对$http服务post方法的修改    $provide.decorator()*/
+angular.module('app').config(['$provide',function($provide){
+    $provide.decorator('$http',['$delegate','$q',function($delegate,$q){
+        $delegate.post = function(url,data,config){
+            var def = $q.defer();    //异步请求，创建延迟加载对象
+            $delegate.get(url).then(function(resp){
+                def.resolve(resp);
+            }).catch(function(err){
+                def.reject(err);
+            });
+            return {
+                success:function(cb){
+                    def.promise.then(cb);
+                },
+                error:function(cb){
+                    def.promise.then(null,cb);
+                }
+            }
+        };
+        return $delegate;
+    }]);
 }]);
 "use strict";
 
@@ -77,12 +100,20 @@ angular.module('app').config(['$stateProvider','$urlRouterProvider',function($st
 
 "use strict";
 
+/*Provider  就是对模块或者服务进行配置*/
 angular.module('app').config(['$validationProvider',function($validationProvider){
     //校验规则
     var expression = {
-        phone:/^1[\d]{10}/,
+        //手机号的校验规则
+        phone:/^1[\d]{10}$/,
+        //密码的校验规则
         password:function(value){
-            return value > 5;
+            var str = value + '';
+            return str.length > 5;
+        },
+        //必填项的校验规则
+        required:function(value){
+            return !!value;
         }
     };
 
@@ -95,6 +126,10 @@ angular.module('app').config(['$validationProvider',function($validationProvider
         password:{
             success:'',
             error:'长度至少六位'
+        },
+        required:{
+            success:'',
+            error:'不能为空'
         }
     };
     //$validationProvider先配置校验规则，然后在配置提示语
@@ -144,25 +179,23 @@ angular.module('app').controller('companyCtrl',['$http','$state','$scope',functi
 'use strict';
 
 angular.module('app').controller('favoriteCtrl',['$http','$scope',function($http,$scope){
-    $scope.tabList=[
-        {
-            id:'all',
-            name:'全部'
-        },{
-            id:'pass',
-            name:'面试邀请'
-        },{
-            id:'fail',
-            name: '不合适'
-        }
-    ];
+    $http.get('data/myFavorite.json').then(function(resp){
+        $scope.list = resp.data;
+    });
 
 
 }]);
 'use strict';
 
-angular.module('app').controller('loginCtrl',['$http','$scope',function($http,$scope){
-
+angular.module('app').controller('loginCtrl',['cache','$http','$scope','$state',function(cache,$http,$scope,$state){
+    $scope.submit = function(){
+        $http.post('data/login.json',$scope.user).success(function(resp){
+            cache.put('id',resp.data.id);
+            cache.put('name',resp.data.name);
+            cache.put('image',resp.data.image);
+            $state.go('main');
+        });
+    };
 }]);
 'use strict';
 /*首页控制器*/
@@ -194,14 +227,26 @@ angular.module('app').controller('mainCtrl', ['$scope','$http', function( $scope
 
 'use strict';
 
-angular.module('app').controller('meCtrl',['$http','$scope',function($http,$scope){
+angular.module('app').controller('meCtrl',['$http','$scope','$state','cache','$cookies',function($http,$scope,$state,cache,cookies){
+    if(cache.get('name')){
+        $scope.name = cache.get('name');
+        $scope.image = cache.get('image');
+    }
 
+
+    $scope.logout = function(){
+        cache.remove('id');
+        cache.remove('name');
+        cache.remove('image');
+        $state.go('main');
+    }
 }]);
 'use strict';
 
 /*职位详情页面控制器*/
-angular.module('app').controller('positionCtrl',['$q','$http','$state','$scope','cache',function($q,$http,$state,$scope,cache){
-    $scope.isLogin=true;
+angular.module('app').controller('positionCtrl',['cache','$q','$http','$state','$scope','$timeout',function(cache,$q,$http,$state,$scope,$timeout){
+    $scope.isLogin=!!cache.get('name');
+    $scope.message = $scope.isLogin?'投个简历':'去登录';
     //调用自定义服务的方法
     cache.put("top",'100');
     cache.remove('top');
@@ -210,6 +255,9 @@ angular.module('app').controller('positionCtrl',['$q','$http','$state','$scope',
         var def=$q.defer();       //延迟加载对象               \\生成deferred异步对象
         $http.get('/data/position.json?id='+$state.params.id).then(function(resp){
             $scope.position = resp.data;
+            if(resp.data.posted){
+                $scope.message = "已投递";
+            }
             def.resolve(resp);   //执行到这里时，改变deferred状态为执行成功，返回resp为从后台取到的数据，可以继续执行then,done
         }).catch(function(err){
             def.reject(err);    //执行到这里时，改变deferred状态为执行失败，返回err为报错，可以继续执行fail
@@ -226,15 +274,95 @@ angular.module('app').controller('positionCtrl',['$q','$http','$state','$scope',
     getPosition().then(function(obj){     //then()方法里可以放两个函数，对应def.reslove（）和 def.reject()
         getCompany(obj.data.companyId);
     });
+
+    //投简历按钮的事件
+    $scope.go = function(){
+        if($scope.message !== '已投递'){
+            if($scope.isLogin){
+                $http.post('data/handle.json',{         //如果登录了就发送简历
+                    id:$scope.position.id
+                }).success(function(resp){
+                    console.log(resp.data);
+                    $scope.message = '已投递';       //投递成功，改变按钮文字
+                });
+            }else{
+                $state.go('login');        //没登录就跳转到登录页面
+            }
+        }
+    }
 }]);
 
 'use strict';
-
+/*投递页面控制器*/
 angular.module('app').controller('postCtrl',['$http','$scope',function($http,$scope){
+    $scope.tabList = [
+        {
+            id:'all',
+            name:'全部'
+        },{
+            id:'pass',
+            name:'面试邀请'
+        },{
+            id:'fail',
+            name:'不合适'
+        }
+    ];
+
+    //请求投递列表
+    $http.get('data/myPost.json').then(function(resp){
+        $scope.positionList=resp.data;
+    });
+
+    $scope.filterObj = {};
+    $scope.tClick = function(id,name){
+        switch (id){
+            case 'all':
+                delete $scope.filterObj.state;
+                break;
+            case  'pass':
+                $scope.filterObj.state = '1';
+                break;
+            case 'fail':
+                $scope.filterObj.state = '-1';
+                break;
+            default:
+        }
+    };
 }]);
 'use strict';
 
-angular.module('app').controller('registerCtrl',['$http','$scope',function($http,$scope){
+/*注册页面控制器*/
+/*
+$interval  定时器服务
+ $interval.cancel()：清除定时器
+*/
+angular.module('app').controller('registerCtrl',['$interval','$http','$scope','$state',function($interval,$http,$scope,$state){
+
+    //注册
+    $scope.submit = function(){
+        $http.post('data/regist.json',$scope.user).success(function(resp){
+            $state.go('login');
+        });
+    };
+//发送短信
+    var count = 60;
+    $scope.send = function(){
+        $http.get('data/code.json').then(function(resp){
+            if(1 === resp.data.state){
+                $scope.time = '60s';
+                count = 60;
+                var interval = $interval(function(){
+                    if(count <= 0){
+                        $interval.cancel(interval);    //取消定时器
+                        $scope.time='';
+                        return;
+                    }
+                    count--;
+                    $scope.time = count + 's';
+                },1000);
+            }
+        })
+    };
 
 }]);
 'use strict';
@@ -343,13 +471,16 @@ angular.module('app').directive('appFoot',[function(){
     };
 }]);*/
 
-angular.module('app').directive('appHead',function(){
+angular.module('app').directive('appHead',['cache',function(cache){
     return{
         restrict:'A',                    
         replace:true,                   
-        templateUrl:'view/template/head.html'
+        templateUrl:'view/template/head.html',
+        link:function($scope){
+            $scope.name = cache.get('name') || '';
+        }
     };
-})
+}]);
 
 
 'use strict';
@@ -401,7 +532,7 @@ angular.module('app').directive('appPositionClass',[function(){
 }]);
 'use strict';
 
-angular.module('app').directive('appPositionInfo',[function(){
+angular.module('app').directive('appPositionInfo',['$http',function($http){
     return{
         restrict:'A',
         replace:true,
@@ -412,23 +543,48 @@ angular.module('app').directive('appPositionInfo',[function(){
             pos:'='
         },
         link:function($scope){
-            $scope.imagePath = $scope.isActive ? 'image/star-active.png' : 'image/star.png'
+            $scope.$watch('pos',function(newVal){
+                if(newVal){
+                    $scope.pos.select = $scope.pos.select || false;    //select,默认值
+                    $scope.imagePath = $scope.isActive ? 'image/star-active.png' : 'image/star.png';
+                }
+            });
+            $scope.favorite = function(){
+                $http.post('data/favorite.json',{
+                    id:$scope.pos.id,
+                    select: !$scope.pos.select
+                }).success(function(resp){
+                    $scope.pos.select = !$scope.pos.select;
+                    $scope.imagePath = $scope.pos.select ? 'image/star-active.png' : 'image/star.png';
+                });
+            }
         }
     }
 }]);
 'use strict';
 
-angular.module('app').directive('appPositionList',function(){
+angular.module('app').directive('appPositionList',['cache','$http',function(cache,$http){
 	return{
 		restrict:'A',                            //调用方式
 		replace:true,                            //替换父元素
 		templateUrl:'view/template/positionList.html',        //模板
 		scope:{                                  //接口
 			data:'=',                            //指令中会创建一个作用域，控制器也有一个作用域，指令相当于是控制器的子元素，
- 			filterObj:'='								// "="表示两者的scope共享，是同一个scope，声明的属性共享,相当于暴露一个data的接口
+ 			filterObj:'=',								// "="表示两者的scope共享，是同一个scope，声明的属性共享,相当于暴露一个data的接口
+			isFavorite:'='
+		},
+		link:function($scope){
+			$scope.select = function(item){
+				$http.post('data/favorite.json',{
+					id:item.id,
+					select:!item.select
+				}).success(function(resp){
+					item.select = !item.select;
+				});
+			}
 		}
 	};
-});
+}]);
 
 'use strict';
 
@@ -446,6 +602,7 @@ angular.module('app').directive('appSheet',function(){
 });
 'use strict';
 
+/*tab指令*/
 angular.module('app').directive('appTab',function(){
     return{
         restrict:'A',
@@ -492,12 +649,12 @@ service(）和facotry()的区别：facotry()在return之前可以定义一些私
 */
 angular.module('app')
    //angular通过service（）方法定义服务
-    .service('cache',['$cookies',function($cookies){
+    .service('cache',['$cookieStore',function($cookies){
         this.put = function(key,value){
             $cookies.put(key,value);
         };
-        this.get = function(key){
-            $cookies.get(key);
+        this.get=function(key){
+            return $cookies.get(key);
         };
         this.remove = function(key){
             $cookies.remove(key);

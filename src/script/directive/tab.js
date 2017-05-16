@@ -1,5 +1,6 @@
 'use strict';
 
+/*tab指令*/
 angular.module('app').directive('appTab',function(){
     return{
         restrict:'A',

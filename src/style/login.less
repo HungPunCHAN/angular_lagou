@@ -10,6 +10,20 @@
   form{
     z-index: 2;
     .mt(260);
+
+    .ng-invalid{
+      &+span{
+        position: absolute;
+        right: 0;
+        color: @headerBgColor;
+        text-align: right;
+        height: 40px;
+        font-size: 14px;
+        p{
+          margin: 0;
+        }
+      }
+    }
     .form-line{
       margin-left: auto;
       margin-right: auto;
@@ -23,7 +37,7 @@
       &:first-child{
         border-bottom: 1px solid @defaultColor;
       };
-      span{
+      span.icon{
         background-color: @iconBgColor;
         height: 100%;
         .w(55);
@@ -39,6 +53,7 @@
         .fs(14);
         .pl(30);
         background-color: @formBgColor;
+        color: @defaultColor;
         &::-webkit-input-placeholder{
           color:@defaultColor;
         }

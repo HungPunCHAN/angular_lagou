@@ -1,5 +1,6 @@
 .position-list{
     margin: 0;
+    margin-bottom:40px;
     .item{
         margin: 0;
         padding: 7px 3px;
@@ -15,6 +16,23 @@
         }
         .text{
             margin: 0;
+            span{
+                margin-right: 15px;
+            }
+        }
+        .icon{
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+            .w(30);
+            .h(28);
+            top:14px;
+            right: 12px;
+            &.star{
+                background-image: url(../image/star.png);
+            }
+            &.star-active{
+                background-image: url(../image/star-active.png);
+            }
         }
     }    
 }
